@@ -1,4 +1,7 @@
 {
+	"flag": {
+        "value": 7
+    },
     "1_russia_blacklist": {
         "dns_addr": "",
         "dns_port": "",
