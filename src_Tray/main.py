@@ -9,7 +9,7 @@ import sys
 import psutil
 
 process = None
-
+FLAG = 7
 ICONS_DIR = "icons"
 
 ICON_OFF_PATH = os.path.join(ICONS_DIR, "icon-off.jpg")
@@ -43,12 +43,12 @@ def load_config(config_path):
         return {}
 
 
-def build_command(config):
+def build_command(config, flag):
     """Creating a command line"""
     architecture = get_architecture()
     exe_path = f'{architecture}\\goodbyedpi.exe'
 
-    command = [exe_path, '-9']
+    command = [exe_path, f'-{flag}']
 
     if config.get('dns_addr'):
         command.extend(['--dns-addr', config['dns_addr']])
@@ -75,8 +75,8 @@ def start_process(config_name):
         print(f'Config: "{config_name}" not found.')
         logging.error(f'Config: "{config_name}" not found.')
         return
-
-    command = build_command(config)
+    flag = config_data['flag']['value']
+    command = build_command(config, flag)
 
     print(f'Executing command: {" ".join(command)}')
     logging.info(f'Executing command: {" ".join(command)}')
