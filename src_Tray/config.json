@@ -1,5 +1,6 @@
 {
     "1_russia_blacklist": {
+		"flag":"7",
         "dns_addr": "",
         "dns_port": "",
         "dnsv6_addr": "",
@@ -10,6 +11,7 @@
         ]
     },
     "1_russia_blacklist_dnsredir": {
+		"flag":"7",
         "dns_addr": "77.88.8.8",
         "dns_port": "1253",
         "dnsv6_addr": "2a02:6b8::feed:0ff",
@@ -20,6 +22,7 @@
         ]
     },
     "2_any_country": {
+		"flag":"9",
         "dns_addr": "",
         "dns_port": "",
         "dnsv6_addr": "",
@@ -27,10 +30,41 @@
         "blacklist": []
     },
     "2_any_country_dnsredir": {
+		"flag":"9",
         "dns_addr": "77.88.8.8",
         "dns_port": "1253",
         "dnsv6_addr": "2a02:6b8::feed:0ff",
         "dnsv6_port": "1253",
         "blacklist": []
+    },
+    "1_russia_blacklist_YOUTUBE": {
+		"flag": "9",
+        "dns_addr": "",
+        "dns_port": "",
+        "dnsv6_addr": "",
+        "dnsv6_port": "",
+		"fake-gen": "5",
+		"fake-from-hex": "160301FFFF01FFFFFF0303594F5552204144564552544953454D454E542048455245202D202431302F6D6F000000000009000000050003000000",
+        "blacklist_cmd_file": "../1_russia_blacklist_YOUTUBE.cmd",
+		"blacklist": [
+            "../russia-blacklist.txt",
+            "../russia-youtube.txt"
+        ]
+    },
+    "1_russia_blacklist_YOUTUBE_ALT": {
+		"flag": "5",
+		"e1": "e1",
+		"q": "q",
+        "dns_addr": "",
+        "dns_port": "",
+        "dnsv6_addr": "",
+        "dnsv6_port": "",
+		"fake-gen": "5",
+		"fake-from-hex": "160301FFFF01FFFFFF0303594F5552204144564552544953454D454E542048455245202D202431302F6D6F000000000009000000050003000000",
+        "blacklist_cmd_file": "../1_russia_blacklist_YOUTUBE_ALT.cmd",
+		"blacklist": [
+            "../russia-blacklist.txt",
+            "../russia-youtube.txt"
+        ]
     }
 }

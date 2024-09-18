@@ -9,7 +9,6 @@ import sys
 import psutil
 
 process = None
-FLAG = 7
 ICONS_DIR = "icons"
 
 ICON_OFF_PATH = os.path.join(ICONS_DIR, "icon-off.jpg")
@@ -58,6 +57,15 @@ def build_command(config, flag):
         command.extend(['--dnsv6-addr', config['dnsv6_addr']])
     if config.get('dnsv6_port'):
         command.extend(['--dnsv6-port', config['dnsv6_port']])
+    if config.get("e1"):
+        command.extend(['--e1', config['e1']])
+    if config.get("q"):
+        command.extend(['--q', config['q']])
+    if config.get("fake-gen"):
+        command.extend(['--fake-gen', config['fake-gen']])
+    if config.get("fake-from-hex"):
+        command.extend(['--fake-from-hex', config['fake-from-hex']])
+
 
     for blacklist in config.get('blacklist', []):
         blacklist_path = os.path.basename(blacklist)
@@ -75,7 +83,7 @@ def start_process(config_name):
         print(f'Config: "{config_name}" not found.')
         logging.error(f'Config: "{config_name}" not found.')
         return
-    flag = config_data['flag']['value']
+    flag = config['flag']
     command = build_command(config, flag)
 
     print(f'Executing command: {" ".join(command)}')
@@ -122,8 +130,10 @@ def update_menu_for_running():
 def update_menu_for_stopped():
     global icon
     menu = pystray.Menu(
-        pystray.MenuItem('Start Russia Blacklist', lambda icon, item: start_process('1_russia_blacklist')),
-        pystray.MenuItem('Start Russia Blacklist DNS',
+        pystray.MenuItem('Start yt_blacklist', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE')),
+        pystray.MenuItem('Start yt_blacklist_alt', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE_ALT')),
+        pystray.MenuItem('Start ru_blacklist', lambda icon, item: start_process('1_russia_blacklist')),
+        pystray.MenuItem('Start ru_blacklist_dnsredir',
                          lambda icon, item: start_process('1_russia_blacklist_dnsredir')),
         pystray.MenuItem('Start Any Country', lambda icon, item: start_process('2_any_country')),
         pystray.MenuItem('Start Any Country DNS', lambda icon, item: start_process('2_any_country_dnsredir')),
@@ -149,8 +159,11 @@ def exit_program(icon, item):
 def create_icon():
     icon_image = Image.open(ICON_OFF_PATH)
     menu = pystray.Menu(
-        pystray.MenuItem('Start Russia Blacklist', lambda icon, item: start_process('1_russia_blacklist')),
-        pystray.MenuItem('Start Russia Blacklist DNS',
+        pystray.MenuItem('Start yt_russia', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE')),
+        pystray.MenuItem('Start yt_russia_ALT', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE_ALT')),
+        pystray.MenuItem('Start ru_blacklist',
+                         lambda icon, item: start_process('1_russia_blacklist')),
+        pystray.MenuItem('Start ru_blacklist_dnsrd',
                          lambda icon, item: start_process('1_russia_blacklist_dnsredir')),
         pystray.MenuItem('Start Any Country', lambda icon, item: start_process('2_any_country')),
         pystray.MenuItem('Start Any Country DNS', lambda icon, item: start_process('2_any_country_dnsredir')),
@@ -160,44 +173,19 @@ def create_icon():
     return icon
 
 
-def get_existing_pid():
-    """Get the PID from the lock file, if it exists."""
-    if os.path.exists(LOCK_FILE_PATH):
-        with open(LOCK_FILE_PATH, 'r') as lock_file:
-            pid = lock_file.read().strip()
-            return int(pid) if pid.isdigit() else None
-    return None
-
-
-def is_process_running(pid):
-    """Check if a process with the given PID is currently running."""
-    try:
-        process = psutil.Process(pid)
-        return process.is_running()
-    except psutil.NoSuchProcess:
-        return False
-
-
 def check_if_running():
-    """Check if another instance is running by checking the lock file."""
-    pid = get_existing_pid()
-    if pid and is_process_running(pid):
-        return True
+    """Check if goodbyedpi.exe is currently running."""
+    for proc in psutil.process_iter(['name']):
+        if proc.info['name'] == 'goodbyedpi.exe':
+            return True
     return False
-
-
-def create_lock_file():
-    """Create a lock file with the current process ID."""
-    with open(LOCK_FILE_PATH, 'w') as lock_file:
-        lock_file.write(str(os.getpid()))
 
 
 if __name__ == "__main__":
     if check_if_running():
-        print("Another instance is already running.")
+        print("Another instance of goodbyedpi.exe is already running.")
+        logging.error("Another instance of goodbyedpi.exe is already running.")
         sys.exit(1)
-
-    create_lock_file()
 
     print("Starting the application...")
     logging.info('Application started.')
