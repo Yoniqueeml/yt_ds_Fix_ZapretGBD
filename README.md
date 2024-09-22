@@ -19,8 +19,11 @@ Tray icon when the application is on:
 ![On](src_Tray/icons/icon-on.png)
 
 ```
+Usage:
+Run the exe file in the folder to run the program (do not rename it, as reruns are caught by the file name!!!).
+Then in the OS tray select the desired mode and run, if you need to change some flag, go to config.json and change it.
 Usage: goodbyedpi.exe [OPTION...]
- -p          block passive DPI
+-p          block passive DPI
  -q          block QUIC/HTTP3
  -r          replace Host with hoSt
  -s          remove space between host header and its value
@@ -63,6 +66,13 @@ Usage: goodbyedpi.exe [OPTION...]
  --reverse-frag           fragment (split) the packets just as --native-frag, but send them in the
                           reversed order. Works with the websites which could not handle segmented
                           HTTPS TLS ClientHello (because they receive the TCP flow "combined").
+ --fake-from-hex <value>  Load fake packets for Fake Request Mode from HEX values (like 1234abcDEF).
+                          This option can be supplied multiple times, in this case each fake packet
+                          would be sent on every request in the command line argument order.
+ --fake-gen <value>       Generate random-filled fake packets for Fake Request Mode, value of them
+                          (up to 30).
+ --fake-resend <value>    Send each fake packet value number of times.
+                          Default: 1 (send each packet once).
  --max-payload [value]    packets with TCP payload data more than [value] won't be processed.
                           Use this option to reduce CPU usage by skipping huge amount of data
                           (like file transfers) in already established sessions.
