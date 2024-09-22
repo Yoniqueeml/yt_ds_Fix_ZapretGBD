@@ -1,8 +1,8 @@
+import re
 import subprocess
 import pystray
 from PIL import Image
 import platform
-import json
 import os
 import logging
 import sys
@@ -17,6 +17,9 @@ ICON_ON_PATH = os.path.join(ICONS_DIR, "icon-on.png")
 LOG_FILE_PATH = "app.log"
 LOCK_FILE_PATH = "app.lock"
 
+global CMD_FILES
+global PARSED_COMMANDS
+
 logging.basicConfig(filename=LOG_FILE_PATH, level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -27,67 +30,26 @@ def get_architecture():
     return 'x86_64' if arch == '64bit' else 'x86'
 
 
-def load_config(config_path):
-    """Get json settings"""
-    try:
-        with open(config_path, 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        print(f'Config file not found: {config_path}')
-        logging.error(f'Config file not found: {config_path}')
-        return {}
-    except json.JSONDecodeError:
-        print(f'Error decoding JSON from config file: {config_path}')
-        logging.error(f'Error decoding JSON from config file: {config_path}')
-        return {}
-
-
-def build_command(config, flag):
+def build_command(cmd_file):
     """Creating a command line"""
     architecture = get_architecture()
     exe_path = f'{architecture}\\goodbyedpi.exe'
 
-    command = [exe_path, f'-{flag}']
-
-    if config.get('dns_addr'):
-        command.extend(['--dns-addr', config['dns_addr']])
-    if config.get('dns_port'):
-        command.extend(['--dns-port', config['dns_port']])
-    if config.get('dnsv6_addr'):
-        command.extend(['--dnsv6-addr', config['dnsv6_addr']])
-    if config.get('dnsv6_port'):
-        command.extend(['--dnsv6-port', config['dnsv6_port']])
-    if config.get("e1"):
-        command.extend(['--e1', config['e1']])
-    if config.get("q"):
-        command.extend(['--q', config['q']])
-    if config.get("fake-gen"):
-        command.extend(['--fake-gen', config['fake-gen']])
-    if config.get("fake-from-hex"):
-        command.extend(['--fake-from-hex', config['fake-from-hex']])
-
-
-    for blacklist in config.get('blacklist', []):
-        blacklist_path = os.path.basename(blacklist)
-        command.extend(['--blacklist', blacklist_path])
-
+    command_temp = ''
+    for i, v in enumerate(CMD_FILES):
+        if v == cmd_file:
+            command_temp = PARSED_COMMANDS[i]
+            break
+    command = exe_path + ' ' + command_temp
+    command =f''.join(command)
     return command
 
 
-def start_process(config_name):
+def start_process(file_name):
     global process
-    config_data = load_config('config.json')
-    config = config_data.get(config_name, {})
-
-    if not config:
-        print(f'Config: "{config_name}" not found.')
-        logging.error(f'Config: "{config_name}" not found.')
-        return
-    flag = config['flag']
-    command = build_command(config, flag)
-
-    print(f'Executing command: {" ".join(command)}')
-    logging.info(f'Executing command: {" ".join(command)}')
+    command = build_command(file_name)
+    print(f'Executing command: {command}')
+    logging.info(f'Executing command: {command}')
 
     if process:
         process.terminate()
@@ -95,8 +57,8 @@ def start_process(config_name):
 
     try:
         process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
-        print(f'Executed: {" ".join(command)}')
-        logging.info(f'Executed: {" ".join(command)}')
+        print(f'Executed: {command}')
+        logging.info(f'Executed: {command}')
     except Exception as e:
         print(f'Failed to start process: {e}')
         logging.error(f'Failed to start process: {e}')
@@ -105,7 +67,7 @@ def start_process(config_name):
     update_menu_for_running()
 
 
-def stop_process(icon, item):
+def stop_process(icon):
     global process
     if process:
         process.terminate()
@@ -129,21 +91,17 @@ def update_menu_for_running():
 
 def update_menu_for_stopped():
     global icon
-    menu = pystray.Menu(
-        pystray.MenuItem('Start yt_blacklist', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE')),
-        pystray.MenuItem('Start yt_blacklist_alt', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE_ALT')),
-        pystray.MenuItem('Start ru_blacklist', lambda icon, item: start_process('1_russia_blacklist')),
-        pystray.MenuItem('Start ru_blacklist_dnsredir',
-                         lambda icon, item: start_process('1_russia_blacklist_dnsredir')),
-        pystray.MenuItem('Start Any Country', lambda icon, item: start_process('2_any_country')),
-        pystray.MenuItem('Start Any Country DNS', lambda icon, item: start_process('2_any_country_dnsredir')),
-        pystray.MenuItem('Exit', exit_program)
-    )
+    menu_items = CMD_FILES + ['Exit']
+
+    def create_menu_item(name):
+        return pystray.MenuItem(name, lambda icon, item: start_process(name))
+
+    menu = pystray.Menu(*(create_menu_item(name) for name in menu_items))
     icon.menu = menu
     icon.update_menu()
 
 
-def exit_program(icon, item):
+def exit_program(icon):
     if process:
         process.terminate()
         process.wait()
@@ -156,19 +114,16 @@ def exit_program(icon, item):
     icon.stop()
 
 
-def create_icon():
+def create_icon(cmd_files):
     icon_image = Image.open(ICON_OFF_PATH)
-    menu = pystray.Menu(
-        pystray.MenuItem('Start yt_russia', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE')),
-        pystray.MenuItem('Start yt_russia_ALT', lambda icon, item: start_process('1_russia_blacklist_YOUTUBE_ALT')),
-        pystray.MenuItem('Start ru_blacklist',
-                         lambda icon, item: start_process('1_russia_blacklist')),
-        pystray.MenuItem('Start ru_blacklist_dnsrd',
-                         lambda icon, item: start_process('1_russia_blacklist_dnsredir')),
-        pystray.MenuItem('Start Any Country', lambda icon, item: start_process('2_any_country')),
-        pystray.MenuItem('Start Any Country DNS', lambda icon, item: start_process('2_any_country_dnsredir')),
-        pystray.MenuItem('Exit', exit_program)
-    )
+
+    menu_items = cmd_files + ['Exit']
+
+    def create_menu_item(name):
+        return pystray.MenuItem(name, lambda icon, item: start_process(name))
+
+    menu = pystray.Menu(*(create_menu_item(name) for name in menu_items))
+
     icon = pystray.Icon("goodbyedpi", icon_image, "GoodByeDPI", menu=menu)
     return icon
 
@@ -180,8 +135,38 @@ def check_if_running():
             return True
     return False
 
+def clean_blacklist_paths(lines):
+    cleaned_lines = []
+    for line in lines:
+        cleaned_line = line.replace('--blacklist ..\\', '--blacklist ')
+        cleaned_lines.append(cleaned_line)
+    return cleaned_lines
+
+def parse_cmd_files(directory):
+    """Parse .cmd files to get their names and commands."""
+    start_pattern = re.compile(r'start\s+""\s+goodbyedpi\.exe\s+(.*)')
+
+    files = []
+    commands = []
+
+    for filename in os.listdir(directory):
+        if filename.endswith('.cmd'):
+            file_path = os.path.join(directory, filename)
+            with open(file_path, 'r', encoding='utf-8') as file:
+                for line in file:
+                    # Проверка на регулярное выражение
+                    if start_pattern.search(line):
+                        files.append(filename)  # Добавляем имя файла
+                        commands.append(line.strip())  # Добавляем найденную строку без пробелов
+
+    commands = clean_blacklist_paths(commands)
+    return files, commands
+
 
 if __name__ == "__main__":
+    directory_path = os.getcwd()
+    CMD_FILES, PARSED_COMMANDS = parse_cmd_files(directory_path)
+
     if check_if_running():
         print("Another instance of goodbyedpi.exe is already running.")
         logging.error("Another instance of goodbyedpi.exe is already running.")
@@ -190,7 +175,7 @@ if __name__ == "__main__":
     print("Starting the application...")
     logging.info('Application started.')
 
-    icon = create_icon()
+    icon = create_icon(CMD_FILES)
     icon.run()
 
     print("Application has stopped.")
