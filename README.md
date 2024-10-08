@@ -10,8 +10,9 @@ It handles DPI connected using optical splitter or port mirroring (**Passive DPI
 # Quick start
 
 Download the latest version and unzip it to any folder. Create a shortcut for the main.exe file and place it on your desktop for easy usage.
-You need to use main.exe to start the program in the tray, and then you can select the desired .cmd to run it. You can modify config.json to change the settings.
+You need to use main.exe to start the program in the tray, and then you can select the desired .cmd to run it.
 You can learn about how to run it in the service from the repo fork.
+You don't need config.json anymore, just throw the cmd you need in the folder with main.exe, if you need to change some flag in some cmd - just change it inside cmd. Added working version after 22.09
 
 Tray icon when the application is off:
 ![Off](src_Tray/icons/icon-off.jpg) <br>
