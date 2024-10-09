@@ -32,6 +32,12 @@ def get_architecture():
 
 def build_command(cmd_file):
     """Creating a command line"""
+    if cmd_file.startswith('zapret'):
+        for i, v in enumerate(CMD_FILES):
+            if v == cmd_file:
+                command_temp = PARSED_COMMANDS[i]
+                break
+        return command_temp
     architecture = get_architecture()
     exe_path = f'{architecture}\\goodbyedpi.exe'
 
@@ -41,7 +47,7 @@ def build_command(cmd_file):
             command_temp = PARSED_COMMANDS[i]
             break
     command = exe_path + ' ' + command_temp
-    command =f''.join(command)
+    command = f''.join(command)
     return command
 
 
@@ -135,12 +141,14 @@ def check_if_running():
             return True
     return False
 
+
 def clean_blacklist_paths(lines):
     cleaned_lines = []
     for line in lines:
         cleaned_line = line.replace('--blacklist ..\\', '--blacklist ')
         cleaned_lines.append(cleaned_line)
     return cleaned_lines
+
 
 def parse_cmd_files(directory):
     """Parse .cmd files to get their names and commands."""
@@ -154,12 +162,88 @@ def parse_cmd_files(directory):
             file_path = os.path.join(directory, filename)
             with open(file_path, 'r', encoding='utf-8') as file:
                 for line in file:
-                    # Проверка на регулярное выражение
                     if start_pattern.search(line):
-                        files.append(filename)  # Добавляем имя файла
-                        commands.append(line.strip())  # Добавляем найденную строку без пробелов
+                        files.append(filename)
+                        commands.append(line.strip())
 
     commands = clean_blacklist_paths(commands)
+    files.append('zapret_preset_my.cmd')
+    command = [
+        "winws.exe",
+        "--wf-tcp=80,443",
+        "--wf-udp=443,50000-65535",
+        "--filter-udp=443",
+        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
+        "--dpi-desync=fake,tamper",
+        "--dpi-desync-repeats=11",
+        "--dpi-desync-fake-quic={}".format(os.path.join(os.path.dirname(__file__), "quic_initial_www_google_com.bin")),
+        "--new",
+        "--filter-udp=443",
+        "--dpi-desync=fake,tamper",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-repeats=11",
+        "--new",
+        "--filter-udp=50000-65535",
+        "--dpi-desync=fake,tamper",
+        "--dpi-desync-any-protocol",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-repeats=11",
+        "--new",
+        "--filter-tcp=80",
+        "--dpi-desync=fake,disorder2",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-fooling=badseq",
+        "--new",
+        "--filter-tcp=443",
+        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
+        "--dpi-desync=fake,disorder2",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-fooling=badseq",
+        "--dpi-desync-fake-tls={}".format(
+            os.path.join(os.path.dirname(__file__), "tls_clienthello_www_google_com.bin")),
+        "--new",
+        "--dpi-desync=fake,tamper",
+        "--dpi-desync-any-protocol",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-fooling=badseq",
+        "--dpi-desync-fake-tls={}".format(
+            os.path.join(os.path.dirname(__file__), "tls_clienthello_www_google_com.bin")),
+    ]
+    commands.append(command)
+
+    files.append('zapret_preset_russia.cmd')
+    command = [
+        os.path.join(os.path.dirname(__file__), "winws.exe"),
+        "--wf-tcp=80,443",
+        "--wf-udp=443",
+        "--filter-udp=443",
+        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
+        "--dpi-desync=fake",
+        "--dpi-desync-repeats=11",
+        "--dpi-desync-fake-quic={}".format(os.path.join(os.path.dirname(__file__), "quic_initial_www_google_com.bin")),
+        "--new",
+        "--filter-udp=443",
+        "--dpi-desync=fake",
+        "--dpi-desync-repeats=11",
+        "--new",
+        "--filter-tcp=80",
+        "--dpi-desync=fake,split2",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-fooling=md5sig",
+        "--new",
+        "--filter-tcp=443",
+        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
+        "--dpi-desync=fake,split2",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-fooling=md5sig",
+        "--dpi-desync-fake-tls={}".format(
+            os.path.join(os.path.dirname(__file__), "tls_clienthello_www_google_com.bin")),
+        "--new",
+        "--dpi-desync=fake,disorder2",
+        "--dpi-desync-autottl=2",
+        "--dpi-desync-fooling=md5sig",
+    ]
+    commands.append(command)
     return files, commands
 
 
