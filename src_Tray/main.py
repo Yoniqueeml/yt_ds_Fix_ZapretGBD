@@ -50,10 +50,10 @@ def start_process(file_name):
         process.wait()
 
     try:
-        for command in PARSED_COMMANDS:
-            process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
-            print(f'Executed: {command}')
-            logging.info(f'Executed: {command}')
+        #for command in PARSED_COMMANDS:
+        process = subprocess.Popen(PARSED_COMMANDS[0], creationflags=subprocess.CREATE_NO_WINDOW)
+        print(f'Executed: {PARSED_COMMANDS[0]}')
+        logging.info(f'Executed: {PARSED_COMMANDS[0]}')
     except Exception as e:
         print(f'Failed to start process: {e}')
         logging.error(f'Failed to start process: {e}')
@@ -149,13 +149,15 @@ def parse_cmd_files(directory):
             with open(file_path, 'r', encoding='utf-8') as file:
                 for line in file:
                     temp = line.strip()
+                    temp_path = os.getcwd()
+                    temp_path = temp_path.replace('/', '//')
                     if temp == '--hostlist=':
-                        temp = temp + rf'{os.getcwd()}\\hostlists.txt'
+                        temp = temp + rf'{temp_path}' + '\\hostlists.txt'
                     elif temp == '--dpi-desync-fake-quic=':
-                        temp = temp + rf'{os.getcwd()}\\quic_initial_www_google_com.bin'
+                        temp = temp + rf'{temp_path}' + '\\quic_initial_www_google_com.bin'
                     elif temp == '--dpi-desync-fake-tls=':
-                        temp = temp +rf'{os.getcwd()}\\tls_clienthello_www_google_com.bin'
-                    comm.append(temp.strip())
+                        temp = temp +rf'{temp_path}' + '\\tls_clienthello_www_google_com.bin'
+                    comm.append(temp)
     commands.append(build_command(comm))
     return commands
 
