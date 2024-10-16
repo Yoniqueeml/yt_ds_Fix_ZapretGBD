@@ -148,7 +148,14 @@ def parse_cmd_files(directory):
             file_path = os.path.join(directory, filename)
             with open(file_path, 'r', encoding='utf-8') as file:
                 for line in file:
-                    comm.append(line.strip())
+                    temp = line.strip()
+                    if temp == '--hostlist=':
+                        temp = temp + rf'{os.getcwd()}\\hostlists.txt'
+                    elif temp == '--dpi-desync-fake-quic=':
+                        temp = temp + rf'{os.getcwd()}\\quic_initial_www_google_com.bin'
+                    elif temp == '--dpi-desync-fake-tls=':
+                        temp = temp +rf'{os.getcwd()}\\tls_clienthello_www_google_com.bin'
+                    comm.append(temp.strip())
     commands.append(build_command(comm))
     return commands
 
