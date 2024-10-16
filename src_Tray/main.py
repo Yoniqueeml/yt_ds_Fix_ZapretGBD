@@ -17,7 +17,6 @@ ICON_ON_PATH = os.path.join(ICONS_DIR, "icon-on.png")
 LOG_FILE_PATH = "app.log"
 LOCK_FILE_PATH = "app.lock"
 
-global CMD_FILES
 global PARSED_COMMANDS
 
 logging.basicConfig(filename=LOG_FILE_PATH, level=logging.DEBUG,
@@ -30,41 +29,31 @@ def get_architecture():
     return 'x86_64' if arch == '64bit' else 'x86'
 
 
-def build_command(cmd_file):
+def build_command(parsed_command):
     """Creating a command line"""
-    if cmd_file.startswith('zapret'):
-        for i, v in enumerate(CMD_FILES):
-            if v == cmd_file:
-                command_temp = PARSED_COMMANDS[i]
-                break
-        return command_temp
-    architecture = get_architecture()
-    exe_path = f'{architecture}\\goodbyedpi.exe'
-
-    command_temp = ''
-    for i, v in enumerate(CMD_FILES):
-        if v == cmd_file:
-            command_temp = PARSED_COMMANDS[i]
-            break
-    command = exe_path + ' ' + command_temp
-    command = f''.join(command)
+    exe_path = parsed_command[0]
+    parsed_command = parsed_command[1:]
+    command = [exe_path] + parsed_command
+    command = f' '.join(command)
     return command
 
 
 def start_process(file_name):
     global process
-    command = build_command(file_name)
-    print(f'Executing command: {command}')
-    logging.info(f'Executing command: {command}')
+
+    for command in PARSED_COMMANDS:
+        print(f'Executing command: {command}')
+        logging.info(f'Executing command: {command}')
 
     if process:
         process.terminate()
         process.wait()
 
     try:
-        process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
-        print(f'Executed: {command}')
-        logging.info(f'Executed: {command}')
+        for command in PARSED_COMMANDS:
+            process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
+            print(f'Executed: {command}')
+            logging.info(f'Executed: {command}')
     except Exception as e:
         print(f'Failed to start process: {e}')
         logging.error(f'Failed to start process: {e}')
@@ -97,7 +86,7 @@ def update_menu_for_running():
 
 def update_menu_for_stopped():
     global icon
-    menu_items = CMD_FILES + ['Exit']
+    menu_items = ['Start'] + ['Exit']
 
     def create_menu_item(name):
         return pystray.MenuItem(name, lambda icon, item: start_process(name))
@@ -123,7 +112,7 @@ def exit_program(icon):
 def create_icon(cmd_files):
     icon_image = Image.open(ICON_OFF_PATH)
 
-    menu_items = cmd_files + ['Exit']
+    menu_items = ['Start'] + ['Exit']
 
     def create_menu_item(name):
         return pystray.MenuItem(name, lambda icon, item: start_process(name))
@@ -152,104 +141,21 @@ def clean_blacklist_paths(lines):
 
 def parse_cmd_files(directory):
     """Parse .cmd files to get their names and commands."""
-    start_pattern = re.compile(r'start\s+""\s+goodbyedpi\.exe\s+(.*)')
-
-    files = []
     commands = []
-
+    comm = []
     for filename in os.listdir(directory):
-        if filename.endswith('.cmd'):
+        if filename == 'confs.txt':
             file_path = os.path.join(directory, filename)
             with open(file_path, 'r', encoding='utf-8') as file:
                 for line in file:
-                    if start_pattern.search(line):
-                        files.append(filename)
-                        commands.append(line.strip())
-
-    commands = clean_blacklist_paths(commands)
-    files.append('zapret_preset_my.cmd')
-    command = [
-        "winws.exe",
-        "--wf-tcp=80,443",
-        "--wf-udp=443,50000-65535",
-        "--filter-udp=443",
-        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
-        "--dpi-desync=fake,tamper",
-        "--dpi-desync-repeats=11",
-        "--dpi-desync-fake-quic={}".format(os.path.join(os.path.dirname(__file__), "quic_initial_www_google_com.bin")),
-        "--new",
-        "--filter-udp=443",
-        "--dpi-desync=fake,tamper",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-repeats=11",
-        "--new",
-        "--filter-udp=50000-65535",
-        "--dpi-desync=fake,tamper",
-        "--dpi-desync-any-protocol",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-repeats=11",
-        "--new",
-        "--filter-tcp=80",
-        "--dpi-desync=fake,disorder2",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-fooling=badseq",
-        "--new",
-        "--filter-tcp=443",
-        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
-        "--dpi-desync=fake,disorder2",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-fooling=badseq",
-        "--dpi-desync-fake-tls={}".format(
-            os.path.join(os.path.dirname(__file__), "tls_clienthello_www_google_com.bin")),
-        "--new",
-        "--dpi-desync=fake,tamper",
-        "--dpi-desync-any-protocol",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-fooling=badseq",
-        "--dpi-desync-fake-tls={}".format(
-            os.path.join(os.path.dirname(__file__), "tls_clienthello_www_google_com.bin")),
-    ]
-    commands.append(command)
-
-    files.append('zapret_preset_russia.cmd')
-    command = [
-        os.path.join(os.path.dirname(__file__), "winws.exe"),
-        "--wf-tcp=80,443",
-        "--wf-udp=443",
-        "--filter-udp=443",
-        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
-        "--dpi-desync=fake",
-        "--dpi-desync-repeats=11",
-        "--dpi-desync-fake-quic={}".format(os.path.join(os.path.dirname(__file__), "quic_initial_www_google_com.bin")),
-        "--new",
-        "--filter-udp=443",
-        "--dpi-desync=fake",
-        "--dpi-desync-repeats=11",
-        "--new",
-        "--filter-tcp=80",
-        "--dpi-desync=fake,split2",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-fooling=md5sig",
-        "--new",
-        "--filter-tcp=443",
-        "--hostlist={}".format(os.path.join(os.path.dirname(__file__), "list-youtube.txt")),
-        "--dpi-desync=fake,split2",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-fooling=md5sig",
-        "--dpi-desync-fake-tls={}".format(
-            os.path.join(os.path.dirname(__file__), "tls_clienthello_www_google_com.bin")),
-        "--new",
-        "--dpi-desync=fake,disorder2",
-        "--dpi-desync-autottl=2",
-        "--dpi-desync-fooling=md5sig",
-    ]
-    commands.append(command)
-    return files, commands
+                    comm.append(line.strip())
+    commands.append(build_command(comm))
+    return commands
 
 
 if __name__ == "__main__":
     directory_path = os.getcwd()
-    CMD_FILES, PARSED_COMMANDS = parse_cmd_files(directory_path)
+    PARSED_COMMANDS = parse_cmd_files(directory_path)
 
     if check_if_running():
         print("Another instance of goodbyedpi.exe is already running.")
@@ -259,7 +165,7 @@ if __name__ == "__main__":
     print("Starting the application...")
     logging.info('Application started.')
 
-    icon = create_icon(CMD_FILES)
+    icon = create_icon([''])
     icon.run()
 
     print("Application has stopped.")
