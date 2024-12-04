@@ -124,7 +124,6 @@ def create_icon(cmd_files):
 
 
 def check_if_running():
-    """Check if goodbyedpi.exe is currently running."""
     for proc in psutil.process_iter(['name']):
         if proc.info['name'] == 'goodbyedpi.exe':
             return True
@@ -140,7 +139,6 @@ def clean_blacklist_paths(lines):
 
 
 def parse_cmd_files(directory):
-    """Parse .cmd files to get their names and commands."""
     commands = []
     comm = []
     for filename in os.listdir(directory):
@@ -151,14 +149,21 @@ def parse_cmd_files(directory):
                     temp = line.strip()
                     temp_path = os.getcwd()
                     temp_path = temp_path.replace('/', '//')
+                    if temp == 'winws.exe':
+                        temp = rf'{temp_path}' + f'\\{temp}'
                     if temp == '--hostlist=':
-                        temp = temp + rf'{temp_path}' + '\\hostlists.txt'
+                        temp = temp + rf'{temp_path}' + '\\list-general.txt'
                     elif temp == '--dpi-desync-fake-quic=':
                         temp = temp + rf'{temp_path}' + '\\quic_initial_www_google_com.bin'
+                    elif temp == '--ipset=':
+                        temp = temp + rf'{temp_path}' + '\\ipset-discord.txt'
                     elif temp == '--dpi-desync-fake-tls=':
                         temp = temp +rf'{temp_path}' + '\\tls_clienthello_www_google_com.bin'
+                    elif temp == '--dpi-desync-split-seqovl-pattern=':
+                        temp = temp + rf'{temp_path}' + '\\tls_clienthello_www_google_com.bin'
                     comm.append(temp)
     commands.append(build_command(comm))
+    print(commands)
     return commands
 
 
