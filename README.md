@@ -110,4 +110,5 @@ Check the .cmd scripts and modify it according to your preference and network co
 
 ## Links
 - **[GoodbyeDPI](https://github.com/ValdikSS/GoodbyeDPI/)** by @ValdikSS
+- **[Zapret](https://github.com/Flowseal/zapret-discord-youtube)** by Flowseal
 
