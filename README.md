@@ -21,7 +21,7 @@ Usage:
 Run the exe file in the folder to run the program 
 (do not rename it, as reruns are caught by the file name!!!).
 Then in the OS tray select the desired mode and run, if you need to change some flag,
- go to confs and change it.
+go to confs and change it.
 ```
 
 To check if your ISP's DPI could be circumvented, first make sure that your provider does not poison DNS answers by enabling "Secure DNS (DNS over HTTPS)" option in your browser.
