@@ -1,9 +1,7 @@
 GoodbyeDPI — Deep Packet Inspection circumvention utility
 =========================
-
-This software designed to bypass Deep Packet Inspection systems found in many Internet Service Providers which block access to certain websites.
-
-It handles DPI connected using optical splitter or port mirroring (**Passive DPI**) which do not block any data but just replying faster than requested destination, and **Active DPI** connected in sequence.
+The current version is based on the flowseal implementation.
+To select the desired parameters in conf.txt, look at the bat. files in flowseal release through editing.
 
 **Windows 7, 8, 8.1, 10 or 11** with administrator privileges required.
 
