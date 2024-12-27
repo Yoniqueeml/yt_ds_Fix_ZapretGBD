@@ -1,7 +1,7 @@
 GoodbyeDPI — Deep Packet Inspection circumvention utility
 =========================
 The current version is based on the flowseal implementation.
-To select the desired parameters in conf.txt, look at the bat. files in flowseal release through editing. (Link below)
+To select the desired parameters in confs.txt, look at the bat. files in flowseal release through editing. (Link below)
 
 **Windows 7, 8, 8.1, 10 or 11** with administrator privileges required.
 
