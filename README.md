@@ -29,6 +29,23 @@ To check if your ISP's DPI could be circumvented, first make sure that your prov
 * **Chrome**: Settings → [Privacy and security](chrome://settings/security) → Use secure DNS → With: NextDNS
 * **Firefox**: [Settings](about:preferences) → Network Settings → Enable DNS over HTTPS → Use provider: NextDNS
 
+# Руководство для пользователей, у которых не работает с первой попытки. 
+- Удалите/выключите все сервисы gdb/zapret
+- Скачайте последний релиз Flowseal (cм. Links) и найдите .bat файл, который будет работать для вас
+Как только вы это сделали, вам останется confs.txt, что для этого нужно сделать:
+Нажимаем кнопку "Изменить" по рабочему для вас .bat файлу, у вас откроется блокнот с его содержимым, открываете мой confs.txt
+В confs.txt удаляете все, кроме первой строчки (winws.exe)
+В .bat файле есть строка (start "zapret: general" /min "%BIN%winws.exe") после этой комбинации идет набор параметров запуска, которые нужно скопировать, каждый новый параметр (двойное тире) должнен начинаться с новой строки (см. confs.txt неизмененный), также, в параметрах, где есть путь к файлу (="....."), удаляете все после знака равно.
+Пример.
+Было:
+start "zapret: general" /min "%BIN%winws.exe" --wf-tcp=80,443 --wf-udp=443,50000-50100 ^
+--filter-udp=443 --hostlist="list-general.txt"
+Стало:
+winws.exe
+--wf-tcp=80,443
+--wf-udp=443,50000-50100 ^
+--filter-udp=443
+--hostlist=
 ## Links
 - **[GoodbyeDPI](https://github.com/ValdikSS/GoodbyeDPI/)** by @ValdikSS
 - **[Zapret](https://github.com/Flowseal/zapret-discord-youtube)** by Flowseal
