@@ -1,0 +1,10 @@
+self-built version Jun 15 2025 09:10:20
+
+we have 8 user defined desync profile(s) and default low priority profile 0
+Loading hostlist E:\PetProjects\TrayForDpi\TraySyncedVersion\src_Tray\lists\list-general.txt
+loading plain text list
+Loaded 46 hosts from E:\PetProjects\TrayForDpi\TraySyncedVersion\src_Tray\lists\list-general.txt
+Loading ipset E:\PetProjects\TrayForDpi\TraySyncedVersion\src_Tray\lists\ipset-all.txt
+loading plain text list
+Loaded 1 ip/subnets from E:\PetProjects\TrayForDpi\TraySyncedVersion\src_Tray\lists\ipset-all.txt
+windivert initialized. capture is started.
