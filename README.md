@@ -16,7 +16,6 @@ To select the desired parameters in confs.txt, look at the bat. files in flowsea
 
 Download the latest version and unzip it to any folder. Create a shortcut for the main.exe file and place it on your desktop for easy usage.
 You need to use main.exe to start the program in the tray.
-If you need to change some flag  - just change it inside confs.
 
 Tray icon when the application is off:
 ![Off](src_Tray/icons/icon-off.jpg) <br>
@@ -26,9 +25,7 @@ Tray icon when the application is on:
 ```
 Usage:
 Run the exe file in the folder to run the program 
-(do not rename it, as reruns are caught by the file name!!!).
-Then in the OS tray select the desired mode and run, if you need to change some flag,
-go to confs and change it.
+(do not rename it, as reruns are caught by the file name).
 ```
 
 To check if your ISP's DPI could be circumvented, first make sure that your provider does not poison DNS answers by enabling "Secure DNS (DNS over HTTPS)" option in your browser.
