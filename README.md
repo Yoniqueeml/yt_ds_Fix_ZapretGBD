@@ -6,7 +6,7 @@
 - Download the latest Flowseal release (see Links) and find the .bat file that works for you.
 Once found, rename it to start_zapret.bat and move it to the folder containing main.exe. After completing these steps, you can run the program and use it as intended.
 
-=========================
+============================ <br>
 The current version is based on the flowseal implementation.
 To select the desired parameters in confs.txt, look at the bat. files in flowseal release through editing. (Link below)
 
